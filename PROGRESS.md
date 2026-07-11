@@ -4,12 +4,13 @@
 > 约定见 CLAUDE.md「进度维护」。稳定约定进 CLAUDE.md，易变状态进这里。
 
 ## 📍 现在在哪
-Week 1。LLM 已接入（grok-4.5 经 CPA，OpenAI 兼容），脚手架就绪，核心逻辑（nodes / loop / judge）尚未实现。
+Week 1。tool-use 往返脚手架已就位（`react_loop.py`：`URL_REPUTATION_TOOL` schema + `_fake_url_reputation` stub + `demo_single_round_trip` 骨架，核心为 TODO(you)）。等本人实现 `demo_single_round_trip`。
 
 ## ▶️ 下一步（1–3 条，做完就换）
-- [ ] 手写单工具 tool-use 循环：先用「假的」url_reputation stub（返回写死 ToolResult），打通 `llm.chat()` 的 `finish_reason == "tool_calls"` 往返
-- [ ] 把 url_reputation 换成真源（VirusTotal / urlscan / Safe Browsing 三选一，先申请 key）
-- [ ] judge 用 response_format(json_schema) + Pydantic 校验产出 TriageReport
+- [ ] 实现 `demo_single_round_trip`：单轮 tool-use 往返（用 stub）→ 跑通后交我审阅
+- [ ] 包成带 `MAX_ITERATIONS` 的 `while` 循环（`run_react_loop`）
+- [ ] 把 stub 换成真 `url_reputation`（VirusTotal / urlscan / Safe Browsing 三选一，先申请 key）
+- [ ] judge 用 `response_format(json_schema)` + Pydantic 校验产出 TriageReport
 
 ## 🗺️ 路线图（大局，勾进度）
 - [~] W1 手写单工具 ReAct loop（URL 信誉）—— 进行中
