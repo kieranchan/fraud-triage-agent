@@ -1,0 +1,32 @@
+# Anti-Fraud Triage Agent — dependencies
+# Loose lower bounds for now; run `pip freeze > requirements.lock.txt` after the
+# first working install to pin exact versions for reproducibility.
+
+# --- Core ---
+anthropic>=0.40           # Claude API SDK (research / judgment engine)
+pydantic>=2.7             # structured output schema + validation
+python-dotenv>=1.0        # load API keys from .env
+httpx>=0.27               # HTTP client for external intel APIs
+
+# --- Tools (Week 2) ---
+rapidfuzz>=3.9            # typosquatting (edit distance)
+tldextract>=5.1           # extract registered domain from a URL
+whoisit>=0.7             # RDAP lookups (preferred, structured JSON)
+python-whois>=0.9         # WHOIS fallback for TLDs without good RDAP coverage
+
+# --- Orchestration (Week 2) ---
+langgraph>=0.2            # state machine / loops / conditional branches
+langchain-anthropic>=0.2  # Claude binding for LangGraph nodes
+
+# --- Eval & observability (Week 3) ---
+langfuse>=2.0             # full-trace observability
+# metrics (accuracy/recall/precision/FPR + confusion matrix) — hand-roll them first
+# to learn; these are only convenience helpers for the confusion-matrix plot:
+# scikit-learn>=1.5
+# matplotlib>=3.9
+
+# --- Dev ---
+pytest>=8.0
+
+# --- Optional (Week 3+, heavy) ---
+# sentence-transformers>=3.0   # semantic matching against a known-scam-phrase library
