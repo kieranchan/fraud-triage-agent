@@ -75,6 +75,11 @@ tests/
 - **别把话术库写死成一堆 if-else** —— 那样不 Agent 也不可扩展。
 - 密钥永不进 git（见 `.gitignore` / `.env.example`）。
 
+## Git 提交约定（重要 —— 跨主机、跨会话都要遵守）
+- 本项目所有 git 提交**一律使用项目负责人本人的身份**（`kieran chan <1119788227@qq.com>`）。
+- **绝不添加 `Co-Authored-By: Claude ...` 或任何 AI 署名 / 尾注。** 这是简历项目，作者归属必须是本人。
+- 帮忙跑 git 命令时按此约定提交；若某个环境的全局默认会自动加 AI 署名，提交时**显式去掉**。
+
 ## 分阶段
 - **第1周**：手写单工具 ReAct loop（URL 信誉），吃透 agentic loop。
 - **第2周**：多工具 + 实体抽取 + LangGraph 重构 + Pydantic schema。
