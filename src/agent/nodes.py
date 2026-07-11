@@ -52,8 +52,10 @@ def reflect(state: AgentState) -> str:
 def judge(state: AgentState) -> AgentState:
     """⑥ Weigh all evidence into a TriageReport (risk level + confidence + reasons).
 
-    TODO(you): implement with client.messages.parse(..., output_format=TriageReport)
-    so the output is schema-validated. Every red flag should map to a piece of
-    evidence in state["evidence"].
+    TODO(you): implement via src.llm.chat(...) with
+      response_format={"type": "json_schema", "json_schema": {"name": "triage_report",
+        "strict": True, "schema": TriageReport.model_json_schema()}}
+    then validate with TriageReport.model_validate_json(resp.choices[0].message.content).
+    Every red flag should map to a piece of evidence in state["evidence"].
     """
     raise NotImplementedError

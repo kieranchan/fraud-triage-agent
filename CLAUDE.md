@@ -41,7 +41,7 @@ tests/
 | 用途 | 选型 |
 |------|------|
 | 语言 | Python 3.11+ |
-| 研判核心 | Claude API（`anthropic` SDK） |
+| 研判核心 | grok-4.5 经 CPA（CLIProxyAPI，OpenAI 兼容端点）；`openai` SDK |
 | 输出校验 | Pydantic v2 |
 | 编排 | LangGraph（第2周引入；第1周先手写 ReAct loop 理解原理） |
 | typosquatting | rapidfuzz（编辑距离） |
@@ -49,13 +49,13 @@ tests/
 | 域名解析 | tldextract（从 URL 提注册域名） |
 | 可观测 | Langfuse（第3周，全链路 trace） |
 
-## Claude API 用法（当前写法，别用过时的）
-- **默认模型 `claude-opus-4-8`**（Opus 4.8）。综合研判、LLM-as-judge 用它。实体抽取这类简单步骤若要省成本可考虑 `claude-haiku-4-5`，但这是**成本决策，由负责人定，别默认降级**。
-- **结构化输出**：`client.messages.parse(model=..., messages=..., output_format=MyPydanticModel)` → `resp.parsed_output`（已校验的 Pydantic 实例）。这是把研判结果强制成 schema 的推荐方式。
-- **思考/推理深度**：`thinking={"type": "adaptive"}` + `output_config={"effort": "high"}`。**不要用 `budget_tokens`**（新模型会返回 400）。
-- `max_tokens`：非流式默认 ~16000。
-- **工具调用**：可用 `@beta_tool` + `client.beta.messages.tool_runner(...)`；第1周建议**手写 loop**（`while stop_reason == "tool_use"`）以吃透原理。
-- API key 从环境变量读（`ANTHROPIC_API_KEY`），**永不硬编码**。
+## LLM 用法（经 CPA / OpenAI 兼容 —— 当前写法，别用过时的 Claude 专属写法）
+- **模型经 CPA（CLIProxyAPI）网关调用，走 OpenAI 兼容端点 `/v1/chat/completions`**。连接参数全在 `.env`：`LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL`。统一通过 `src/llm.py` 的 `chat()` 调，别在各处 new client。
+- **默认模型 `grok-4.5`**（推理模型）。代理也提供 `claude-*` / `gpt-5.x`，换模型只改 `.env` 的 `LLM_MODEL`、代码不动 —— 换模型是成本/质量决策，由负责人定。
+- **结构化输出**：`response_format={"type":"json_schema","json_schema":{"name":..., "strict":True, "schema": MyModel.model_json_schema()}}`，拿到 `resp.choices[0].message.content` 后用 `MyModel.model_validate_json(...)` 校验。（**不要**用 Anthropic 的 `messages.parse` / `output_format` —— grok 不走 Anthropic 端点。）
+- **工具调用 / ReAct 循环（OpenAI 风格）**：传 `tools=[...]`；模型要用工具时 `resp.choices[0].finish_reason == "tool_calls"`，你执行后把结果作为 `{"role":"tool","tool_call_id":..., "content":...}` 追加回 messages，再调一次。第 1 周手写这个 `while` 循环吃透原理。
+- key 从环境变量 / `.env` 读，**永不硬编码、永不进 git**。
+- ⚠️ Anthropic 专属的 `thinking` / `output_config effort` / `messages.parse` 在这条链路上不适用（实测 grok 经 `/v1/messages` 返回空）。
 
 ## 评估纪律（这个项目含金量最高的部分）
 - eval 必须**可复现**：建数据集时把每个样本的工具返回**快照缓存**进 `eval/fixtures/`，离线 eval 全程读缓存 —— 指标只反映代码变化，不受外部 API 波动影响，也不烧 API 额度。

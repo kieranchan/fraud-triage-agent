@@ -8,6 +8,12 @@ Start with ONE tool (url_reputation). Get: input a URL -> the Agent decides to l
 it up -> reads the result -> gives a verdict. Then make it loop.
 
 The shape below is intentionally skeletal. Fill in the TODOs yourself.
+
+LLM calls go through src.llm.chat() (grok-4.5 via the CPA gateway). This is an
+OpenAI-style tool loop: the model asks for a tool when
+resp.choices[0].finish_reason == "tool_calls"; you run it, append a
+{"role": "tool", "tool_call_id": ..., "content": ...} message, then call again
+until it stops. (See CLAUDE.md "LLM 用法".)
 """
 from __future__ import annotations
 
